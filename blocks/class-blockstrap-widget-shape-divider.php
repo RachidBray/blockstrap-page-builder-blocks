@@ -80,7 +80,7 @@ class BlockStrap_Widget_Shape_Divider extends WP_Super_Duper {
 	 */
 	public function output( $args = array(), $widget_args = array(), $content = '' ) {
 
-		$content = str_replace( '&lt;', '<', $content );
+		//$content = str_replace( '&lt;', '<', $content ); // this could cause XSS in search
 
 		if ( empty( $content ) ) {
 			return '';
@@ -119,6 +119,7 @@ class BlockStrap_Widget_Shape_Divider extends WP_Super_Duper {
 					//$css += 'width: 100%;';
 					$css += 'line-height: 0;';
 					$css += 'overflow: hidden;';
+					$css += 'margin: 0 1px;';
 
 
 					const can_flip = ["mountains", "drops", "clouds", "pyramids", "triangle-asymmetrical", "tilt", "opacity-tilt", "curve-asymmetrical", "waves", "wave-brush", "waves-pattern"];

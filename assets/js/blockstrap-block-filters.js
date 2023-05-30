@@ -280,10 +280,21 @@ function blockstrap_blocks_add_editor_compat_class(){
 Remove the "Apply Globally" button as it adds a new advanced tab in block settings and is not used by any of our blocks.
 @todo remove this once they add an option to remove per block https://github.com/WordPress/gutenberg/issues/47256
  */
-wp.hooks.removeFilter(
-	'editor.BlockEdit',
-	'core/edit-site/push-changes-to-global-styles'
-);
+function blockstrap_blocks_remove_gloabl_styles(){
+	wp.hooks.removeFilter(
+		'editor.BlockEdit',
+		'core/edit-site/push-changes-to-global-styles'
+	);
+}
+blockstrap_blocks_remove_gloabl_styles();
+
+
+wp.domReady( function() {
+	blockstrap_blocks_remove_gloabl_styles();
+	setTimeout(function () {
+		blockstrap_blocks_remove_gloabl_styles();
+	}, 5000);
+});
 
 //
 // function blockstrap_blocks_add_post_editor_root_class(){
@@ -328,3 +339,61 @@ wp.hooks.removeFilter(
 //
 // } );
 
+
+// custom-link-in-toolbar.js
+// wrapped into IIFE - to leave global space clean.
+
+/*
+wp.domReady( function() {
+( function( window, wp ){
+	//alert(1);
+
+	// just to keep it cleaner - we refer to our link by id for speed of lookup on DOM.
+	var link_id = 'Your_Super_Custom_Link';
+
+	// prepare our custom link's html.
+	var link_html = '<div class="bsui"><button id="' + link_id + '" class="btn btn-sm btn-primary" onclick="bpbb_open_template_modal()"  ><i class="fas fa-th-large mr-2 me-2"></i> BlockStrap Templates</button></div>';
+
+	// check if gutenberg's editor root element is present.
+	var editorEl = document.getElementById( 'editor' );
+	if( !editorEl ){ // do nothing if there's no gutenberg root element on page.
+		return;
+	}
+
+	var unsubscribe = wp.data.subscribe( function () {
+		setTimeout( function () {//alert(2);
+			if ( !document.getElementById( link_id ) ) {//alert(3);
+				var toolbalEl = editorEl.querySelector( '.edit-post-header-toolbar__left' );
+				if( toolbalEl instanceof HTMLElement ){
+					toolbalEl.insertAdjacentHTML( 'beforeend', link_html );
+				}
+			}
+		}, 1 )
+	} );
+	// unsubscribe is a function - it's not used right now
+	// but in case you'll need to stop this link from being reappeared at any point you can just call unsubscribe();
+
+} )( window, wp )
+
+} );
+
+function bpbb_open_template_modal(){
+	var $loading = '<div class="d-flex align-items-center justify-content-center h-100"><div class="spinner-border text-muted fs-2" role="status">\n' +
+		'  <span class="visually-hidden">Loading...</span>\n' +
+		'</div></div>';
+	aui_modal('Templates',$loading,'',true,'','modal-fullscreen p-5','');
+	bpbb_get_template_html();
+}
+
+
+function bpbb_get_template_html($page){
+	var data = {
+		'action': 'bpbb_get_templates',
+		'whatever': 123      // We pass php values differently!
+	};
+	// We can also pass the url value separately from ajaxurl for front end AJAX implementations
+	jQuery.post(ajaxurl, data, function(response) {
+		jQuery('#aui-modal .modal-body').html(response);
+	});
+}
+*/

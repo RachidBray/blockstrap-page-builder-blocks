@@ -35,7 +35,7 @@ if ( ! class_exists( 'AyeCode_UI_Settings' ) ) {
 		 *
 		 * @var string
 		 */
-		public $version = '0.1.91';
+		public $version = '0.1.96';
 
 		/**
 		 * Class textdomain.
@@ -409,6 +409,7 @@ if ( ! class_exists( 'AyeCode_UI_Settings' ) ) {
 				// Only enable on set pages
 				$aui_screens = array(
 					'page',
+                    //'docs',
 					'post',
 					'settings_page_ayecode-ui-settings',
 					'appearance_page_gutenberg-widgets',
@@ -531,7 +532,7 @@ if ( ! class_exists( 'AyeCode_UI_Settings' ) ) {
 				.bs-tooltip-top .arrow{
 					margin-left:0px;
 				}
-
+				
 				.custom-switch input[type=checkbox]{
 				    display:none;
 				}
@@ -959,35 +960,30 @@ if ( ! class_exists( 'AyeCode_UI_Settings' ) ) {
 					?>
                 </form>
 
-                <div id="wpbs-version"  data-aui-source="<?php echo esc_attr( $this->get_load_source() ); ?>"><?php echo $this->version; ?></div>
+                <div id="wpbs-version" data-aui-source="<?php echo esc_attr( $this->get_load_source() ); ?>"><?php echo $this->version; ?></div>
             </div>
 
 			<?php
 		}
 
-		/**
-		 * Get the source plugin or theme loading the AUI.
-		 *
-		 * @return string|null
-		 */
-		public function get_load_source(){
-			$file = str_replace( array( "/", "\\" ), "/", realpath( __FILE__ ) );
-			$plugins_dir = str_replace( array( "/", "\\" ), "/", realpath( WP_PLUGIN_DIR ) );
+        public function get_load_source(){
+	        $file = str_replace( array( "/", "\\" ), "/", realpath( __FILE__ ) );
+	        $plugins_dir = str_replace( array( "/", "\\" ), "/", realpath( WP_PLUGIN_DIR ) );
 
-			// Find source plugin/theme of SD
-			$source = array();
-			if ( strpos( $file, $plugins_dir ) !== false ) {
-				$source = explode( "/", plugin_basename( $file ) );
-			} else if ( function_exists( 'get_theme_root' ) ) {
-				$themes_dir = str_replace( array( "/", "\\" ), "/", realpath( get_theme_root() ) );
+	        // Find source plugin/theme of SD
+	        $source = array();
+	        if ( strpos( $file, $plugins_dir ) !== false ) {
+		        $source = explode( "/", plugin_basename( $file ) );
+	        } else if ( function_exists( 'get_theme_root' ) ) {
+		        $themes_dir = str_replace( array( "/", "\\" ), "/", realpath( get_theme_root() ) );
 
-				if ( strpos( $file, $themes_dir ) !== false ) {
-					$source = explode( "/", ltrim( str_replace( $themes_dir, "", $file ), "/" ) );
-				}
-			}
+		        if ( strpos( $file, $themes_dir ) !== false ) {
+			        $source = explode( "/", ltrim( str_replace( $themes_dir, "", $file ), "/" ) );
+		        }
+	        }
 
-			return isset($source[0]) ? esc_attr($source[0]) : '';
-		}
+            return isset($source[0]) ? esc_attr($source[0]) : '';
+        }
 
 		public function customizer_settings($wp_customize){
 			$wp_customize->add_section('aui_settings', array(
@@ -1074,9 +1070,10 @@ if ( ! class_exists( 'AyeCode_UI_Settings' ) ) {
 			$colors = array();
 			if ( defined( 'BLOCKSTRAP_VERSION' ) ) {
 
+
 				$setting = wp_get_global_settings();
 
-//                print_r(wp_get_global_styles());exit;
+//                print_r(wp_get_global_styles());//exit;
 //                print_r(get_default_block_editor_settings());exit;
 
 //                print_r($setting);echo  '###';exit;
@@ -1211,6 +1208,7 @@ if ( ! class_exists( 'AyeCode_UI_Settings' ) ) {
 			global $aui_bs5;
 
 			$is_var = false;
+			$is_custom = strpos($type, 'custom-') !== false ? true : false;
 			if(!$color_code){return '';}
 			if(strpos($color_code, 'var') !== false){
 				//if(!sanitize_hex_color($color_code)){
@@ -1259,6 +1257,7 @@ if ( ! class_exists( 'AyeCode_UI_Settings' ) ) {
 				".alert-{$type}"                                            => array( 'b', 'o' ),
 				".bg-{$type}"                                               => array( 'b', 'f' ),
 				".btn-link.btn-{$type}"                                     => array( 'c' ),
+				".text-{$type}"                                     => array( 'c' ),
 			);
 
 			if ( $aui_bs5 ) {
@@ -1315,10 +1314,9 @@ if ( ! class_exists( 'AyeCode_UI_Settings' ) ) {
 
 			$output .= $prefix . ' .link-'.esc_attr($type).':hover {color: rgba(var(--bs-'.esc_attr($type).'-rgb), .8) !important;}';
 
-
 			//  buttons
 			$output .= $prefix . ' .btn-'.esc_attr($type).'{';
-			$output .= '
+			$output .= ' 
             --bs-btn-bg: '.esc_attr($color_code).';
             --bs-btn-border-color: '.esc_attr($color_code).';
             --bs-btn-hover-bg: rgba(var(--bs-'.esc_attr($type).'-rgb), .9);
@@ -1340,7 +1338,7 @@ if ( ! class_exists( 'AyeCode_UI_Settings' ) ) {
 
 			//  buttons outline
 			$output .= $prefix . ' .btn-outline-'.esc_attr($type).'{';
-			$output .= '
+			$output .= ' 
             --bs-btn-border-color: '.esc_attr($color_code).';
             --bs-btn-hover-bg: rgba(var(--bs-'.esc_attr($type).'-rgb), .9);
             --bs-btn-hover-border-color: rgba(var(--bs-'.esc_attr($type).'-rgb), .9);
@@ -1362,7 +1360,7 @@ if ( ! class_exists( 'AyeCode_UI_Settings' ) ) {
 
             // button hover
 			$output .= $prefix . ' .btn-'.esc_attr($type).':hover{';
-			$output .= '
+			$output .= ' 
             box-shadow: 0 0.25rem 0.25rem 0.125rem rgb(var(--bs-'.esc_attr($type).'-rgb), .1), 0 0.375rem 0.75rem -0.125rem rgb(var(--bs-'.esc_attr($type).'-rgb) , .4);
             }
             ';
@@ -1374,6 +1372,65 @@ if ( ! class_exists( 'AyeCode_UI_Settings' ) ) {
 				$output .= 'html body {--bs-'.esc_attr($type).'-rgb: '.$rgb.'; }';
 			}
 
+
+			if ( $is_custom ) {
+
+//				echo '###'.$type;exit;
+
+				// build rules into each type
+				foreach($selectors as $selector => $types){
+					$selector = $compatibility ? $compatibility . " ".$selector : $selector;
+					$types = array_combine($types,$types);
+					if(isset($types['c'])){$color[] = $selector;}
+					if(isset($types['b'])){$background[] = $selector;}
+					if(isset($types['o'])){$border[] = $selector;}
+					if(isset($types['f'])){$fill[] = $selector;}
+				}
+
+//				// build rules into each type
+//				foreach($important_selectors as $selector => $types){
+//					$selector = $compatibility ? $compatibility . " ".$selector : $selector;
+//					$types = array_combine($types,$types);
+//					if(isset($types['c'])){$color_i[] = $selector;}
+//					if(isset($types['b'])){$background_i[] = $selector;}
+//					if(isset($types['o'])){$border_i[] = $selector;}
+//					if(isset($types['f'])){$fill_i[] = $selector;}
+//				}
+
+				// add any color rules
+				if(!empty($color)){
+					$output .= implode(",",$color) . "{color: $color_code;} ";
+				}
+				if(!empty($color_i)){
+					$output .= implode(",",$color_i) . "{color: $color_code !important;} ";
+				}
+
+				// add any background color rules
+				if(!empty($background)){
+					$output .= implode(",",$background) . "{background-color: $color_code;} ";
+				}
+				if(!empty($background_i)){
+					$output .= $aui_bs5 ? '' : implode(",",$background_i) . "{background-color: $color_code !important;} ";
+//				$output .= implode(",",$background_i) . "{background-color: rgba(var(--bs-primary-rgb), var(--bs-bg-opacity)) !important;} ";
+				}
+
+				// add any border color rules
+				if(!empty($border)){
+					$output .= implode(",",$border) . "{border-color: $color_code;} ";
+				}
+				if(!empty($border_i)){
+					$output .= implode(",",$border_i) . "{border-color: $color_code !important;} ";
+				}
+
+				// add any fill color rules
+				if(!empty($fill)){
+					$output .= implode(",",$fill) . "{fill: $color_code;} ";
+				}
+				if(!empty($fill_i)){
+					$output .= implode(",",$fill_i) . "{fill: $color_code !important;} ";
+				}
+
+			}
 
 
 
@@ -1399,6 +1456,10 @@ if ( ! class_exists( 'AyeCode_UI_Settings' ) ) {
 			$output .= $prefix ." .btn-outline-{$type}:not(:disabled):not(.disabled):active:focus, $prefix .btn-outline-{$type}:not(:disabled):not(.disabled).active:focus, .show>$prefix .btn-outline-{$type}.dropdown-toggle:focus{box-shadow: 0 0 0 0.2rem $op_25;} ";
 			$output .= $prefix ." .btn-{$type}:not(:disabled):not(.disabled):active, $prefix .btn-{$type}:not(:disabled):not(.disabled).active, .show>$prefix .btn-{$type}.dropdown-toggle{background-color: ".$darker_10.";    border-color: ".$darker_125.";} ";
 			$output .= $prefix ." .btn-{$type}:not(:disabled):not(.disabled):active:focus, $prefix .btn-{$type}:not(:disabled):not(.disabled).active:focus, .show>$prefix .btn-{$type}.dropdown-toggle:focus {box-shadow: 0 0 0 0.2rem $op_25;} ";
+
+			// text
+//			$output .= $prefix .".xxx, .text-{$type} {color: var(--bs-".esc_attr($type).");} ";
+
 
 //			if ( $type == 'primary' ) {
 //				// dropdown's
@@ -2758,9 +2819,13 @@ if ( ! class_exists( 'AyeCode_UI_Settings' ) ) {
                             if ((typeof field.value === 'object' || typeof field.value === 'array') && !field.value.length && $el.find('select option:first').text() == '') {
                                 $el.find('select option:first').remove(); // Clear first option to show placeholder.
                             }
-                            jQuery.each(field.value, function(i, v) {
-                                $el.find('select').find('option[value="' + v + '"]').attr('selected', true);
-                            });
+                            if (typeof field.value === 'string') {
+                                $el.find('select').val(field.value);
+                            } else {
+                                jQuery.each(field.value, function(i, v) {
+                                    $el.find('select').find('option[value="' + v + '"]').attr('selected', true);
+                                });
+                            }
                             $el.find('select').trigger('change');
                             break;
                         case 'checkbox':
